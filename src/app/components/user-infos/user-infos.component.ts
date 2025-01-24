@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { UpdateUserService } from '../../services/update-user.service';
+import { CreateUserService } from '../../services/create-user.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-user-infos',
@@ -18,6 +20,24 @@ export class UserInfosComponent {
   });
 
   private readonly _updateUserService = inject(UpdateUserService);
+  private readonly _createUserService = inject(CreateUserService);
+
+  createUser() {
+    this._createUserService.createUser(this.userInfosForm.value as any).subscribe({
+      next: () => {
+        this.userInfosForm.setErrors({ 'create-user-success': true});
+      },
+      error: (error: HttpErrorResponse) => {
+        const ALREADY_EXISTING_USERS = error.status === 409;
+
+        if(ALREADY_EXISTING_USERS) {
+          return this.userInfosForm.setErrors({ 'existing-user-error': true});
+        }
+
+        return this.userInfosForm.setErrors({ 'create-user-error':true});
+      }
+    })
+  }
 
   updateUser() {
     this._updateUserService.updateUser(this.userInfosForm.value as any).subscribe({
