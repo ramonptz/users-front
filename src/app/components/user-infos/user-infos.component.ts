@@ -29,6 +29,7 @@ export class UserInfosComponent {
         this.userInfosForm.setErrors({ 'create-user-success': true});
       },
       error: (error: HttpErrorResponse) => {
+        console.log('ERROR!!!: ',error.message)
         const ALREADY_EXISTING_USERS = error.status === 409;
 
         if(ALREADY_EXISTING_USERS) {
